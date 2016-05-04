@@ -1,0 +1,75 @@
+"Phrases"
+{
+	"High Ping Violation"
+	{
+		"#format"   "{1:d},{2:d},{3:d}"
+		"en"        "Your ping is too high: {1}, Max: {2}.\n{3} sec remaining before getting kicked."
+		"de"        "Dein Ping ist zu hoch: {1}, Max: {2}.\n{3} sec verbleiben bis ein Kick wegen erfolgt."
+		"pl"        "Twój ping jest za wysoki: {1}, Max: {2}.\nPozostało {3} sek zanim zostaniesz kicknięty."
+		"nl"        "Je ping is te hoog: {1}, Max: {2}.\n{3} sec voordat je gekicked wordt wegens."
+		"fr"        "Votre ping est trop élevé: {1}, Max: {2}.\n{3} sec restantes avant d'être kicker."
+	}
+        "High Ping Violation Ban"
+        {
+                "#format"   "{1:d},{2:d},{3:d}"
+                "en"        "Your ping is too high: {1}, Max: {2}.\n{3} sec remaining before getting BANNED."
+                "de"        "Dein Ping ist zu hoch: {1}, Max: {2}.\n{3} sec verbleiben bis ein BAN wegen erfolgt."
+                "pl"        "Twój ping jest za wysoki: {1}, Max: {2}.\nPozostało {3} sek zanim zostaniesz zbanowany."
+                "nl"        "Je ping is te hoog: {1}, Max: {2}.\n{3} sec voordat je gebanned wordt wegens."
+                "fr"        "Votre ping est trop élevé: {1}, Max: {2}.\n{3} sec restantes avant d'être BANNER."
+        }
+	"High Choke Violation"
+	{
+		"#format"   "{1:d}"
+		"en"        "{1} seconds remaining before getting kicked for a high choke violation"
+		"de"        "{1} Sekunden verbleiben bis ein Kick wegen zu hochem Choke erfolgt."
+		"pl"        "{1} Pozostało sekund zanim zostaniesz usunięty za wysoki choke"
+		"nl"        "{1} seconden voordat je gekicked wordt wegens een te hoge choke"
+		"fr"        "{1} secondes restantes avant d'être kicker pour choke trop élevé"
+	}
+	"High Loss Violation"
+	{
+		"#format"   "{1:d}"
+		"en"        "{1} seconds remaining before getting kicked for a high loss violation"
+		"de"        "{1} Sekunden verbleiben bis ein Kick wegen zu hochem Paketverlust erfolgt."
+		"pl"        "{1} Pozostało sekund zanim zostaniesz usunięty za wysoki loss"
+		"nl"        "{1} seconden voordat je gekicked wordt wegens een te hoge loss"
+		"fr"        "{1} secondes restantes avant d'être kicker pour loss trop élevé"
+	}
+	"Hit Connection Violations"
+	{
+		"#format"   "{1:d},{2:d}"
+		"en"        "Sorry, You've hit {1} connection violations and have been banned for {2} minutes"
+		"de"        "Sorry, Du hast {1} Verbindungsverstöße erreicht und wirst für {2} Minuten gebannt."
+		"pl"        "Wybacz, Masz {1} złych połaczen i zostaniesz zbanowany na {2} minut"
+		"nl"        "Sorry. Je hebt {1} overtredingen uitstaan en bent gebanned voor {2} minuten"
+		"fr"        "Désolé vous avez {1} violation des regles de connexion et avez été banni pour {2} minutes"
+	}
+	"Ping Too High"
+	{
+		"#format"   "{1:f}"
+		"en"        "Sorry your ping is too high. Max ping is {1}"
+		"de"        "Sorry dein Ping ist zu hoch. Max Ping ist {1}"
+		"pl"        "Wybacz, masz za wysoki PING. Maksymalny ping to {1}"
+		"nl"        "Sorry, je ping is te hoog. De maximum ping is {1}"
+		"fr"        "Désolé votre ping est trop élevé, ping maximum autorisé : {1}"
+	}
+	"Choke Too High"
+	{
+		"#format"   "{1:f}"
+		"en"        "Sorry your choke is too high. Max choke is {1}"
+		"de"        "Sorry dein Choke ist zu hoch. Max Ping ist {1}"
+		"pl"        "Wybacz masz za wysoki choke. Maksymalny choke to {1}"
+		"nl"        "Sorry, je choke is te hoog. De maximum choke is {1}"
+		"fr"        "Désolé votre choke est trop élevé, choke maximum autorisé : {1}"
+	}
+	"Loss Too High"
+	{
+		"#format"    "{1:f}"
+		"en"        "Sorry your loss is too high. Max loss is {1}"
+		"de"        "Sorry dein Paketverlust ist zu hoch. Max Paketverlust ist {1}"
+		"pl"        "Wybacz Twój loss jest za wysoki. Maksymalny loss to {1}"
+		"nl"        "Sorry, je loss is te hoog. De maximum loss is {1}"
+		"fr"        "Désolé votre loss est trop élevé, loss maximum autorisé : {1}"
+  }
+}
