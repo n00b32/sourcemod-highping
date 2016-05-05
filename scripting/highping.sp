@@ -29,11 +29,15 @@
  * or <http://www.sourcemod.net/license.php>.
  *
  */
+ // some more to copycat 
+ // https://forums.alliedmods.net/showthread.php?p=769939
+ // 
 
 #pragma semicolon 1
 #include <sourcemod>
 #include <sdktools>
 #include <morecolors>
+#include <emitsoundany>
 #undef REQUIRE_EXTENSIONS
 #include <connect>
 #define REQUIRE_EXTENSIONS
@@ -57,6 +61,9 @@ new Handle:g_Cvar_MaxKickCounts = INVALID_HANDLE;
 new Handle:g_Cvar_KickCountLimitBanTime = INVALID_HANDLE;
 new Handle:g_Cvar_ConnectionBreakWarn = INVALID_HANDLE;
 new Handle:g_Cvar_KickCountClearTime = INVALID_HANDLE;
+
+new Handle:g_Cvar_PlayWarningSound = INVALID_HANDLE; // TODO : different sounds per action
+
 new g_FailedChecks[MAXPLAYERS+1];                   // number of checks clients have failed
 new g_Ping[MAXPLAYERS+1];                           
 new g_ChokePoints[MAXPLAYERS+1];
@@ -72,6 +79,9 @@ new Handle:g_hClientLastKick = INVALID_HANDLE;
 //new Handle:g_cVarMaxChokePoints = INVALID_HANDLE;
 //new Handle:g_cVarMaxLossPoints = INVALID_HANDLE;
 
+
+new bool:g_sndWarningAvailable = false;
+new String:g_sndWarning[PLATFORM_MAX_PATH];
 
 
 public Plugin:myinfo =
@@ -106,7 +116,10 @@ public OnPluginStart( )
     g_Cvar_ConnectionBreakWarn = CreateConVar ("hpk_connectionbreakwarn", "1.0", "Warn the user for the last 10 connection limit breaks every second until kicked/& banned", 0, true, 0.0, true, 1.0);
     g_Cvar_KickCountLimitBanTime = CreateConVar ("hpk_bantime", "1", "Set the ban time a user gets for breaking the kick count limit");//, 0, true, 1, true, 1440);
     g_Cvar_KickCountClearTime = CreateConVar ("hpk_kickcountcleartime", "1", "How often to clear the kick counts array, 1 = minute");//, 0, true, 1, true, 99999);
+    
 
+    g_Cvar_PlayWarningSound = CreateConVar ("hpk_warningsound", /*""*/"highping.mp3", "Warning sound (this will be replaced with different cvars");
+    LoadSounds();
 
 //    TODO :
 //    g_cVarMaxChokePoints = CreateConVar ("yghpr_maxchokepoints", "60.0", "Set the maximum choke points, updated once a second", 0, true, 1.0, true, 900.0);
@@ -207,12 +220,15 @@ UpdatePingStatus(client)
     if(g_Ping[client] > GetConVarFloat(g_Cvar_MaxPing)){
 
         if(GetKickCount(client)<GetConVarInt(g_Cvar_MaxKickCounts)){
-            CPrintToChat(client, "{red} %t", "High Ping Violation", RoundToZero(ping), RoundToZero(GetConVarFloat(g_Cvar_MaxPing)), RoundToZero((GetConVarInt(g_Cvar_MaxChecks) - g_FailedChecks[client])*GetConVarFloat(g_Cvar_RepeatCheck)) );
-            PrintCenterText(client, "%t", "High Ping Violation", RoundToZero(ping), RoundToZero(GetConVarFloat(g_Cvar_MaxPing)), RoundToZero((GetConVarInt(g_Cvar_MaxChecks) - g_FailedChecks[client])*GetConVarFloat(g_Cvar_RepeatCheck)) );
+            CPrintToChat(client, "{red} %T", "High Ping Violation", client,  RoundToZero(ping), RoundToZero(GetConVarFloat(g_Cvar_MaxPing)), RoundToZero((GetConVarInt(g_Cvar_MaxChecks) - g_FailedChecks[client])*GetConVarFloat(g_Cvar_RepeatCheck)) );
+            PrintCenterText(client, "%T", "High Ping Violation", client, RoundToZero(ping), RoundToZero(GetConVarFloat(g_Cvar_MaxPing)), RoundToZero((GetConVarInt(g_Cvar_MaxChecks) - g_FailedChecks[client])*GetConVarFloat(g_Cvar_RepeatCheck)) );
         }else{
-            CPrintToChat(client, "{red} %t", "High Ping Violation Ban", RoundToZero(ping), RoundToZero(GetConVarFloat(g_Cvar_MaxPing)), RoundToZero((GetConVarInt(g_Cvar_MaxChecks) - g_FailedChecks[client])*GetConVarFloat(g_Cvar_RepeatCheck)) );
-            PrintCenterText(client, "%t", "High Ping Violation Ban", RoundToZero(ping), RoundToZero(GetConVarFloat(g_Cvar_MaxPing)), RoundToZero((GetConVarInt(g_Cvar_MaxChecks) - g_FailedChecks[client])*GetConVarFloat(g_Cvar_RepeatCheck)) );
+            CPrintToChat(client, "{red} %T", "High Ping Violation Ban", client,  RoundToZero(ping), RoundToZero(GetConVarFloat(g_Cvar_MaxPing)), RoundToZero((GetConVarInt(g_Cvar_MaxChecks) - g_FailedChecks[client])*GetConVarFloat(g_Cvar_RepeatCheck)) );
+            PrintCenterText(client, "%T", "High Ping Violation Ban", client, RoundToZero(ping), RoundToZero(GetConVarFloat(g_Cvar_MaxPing)), RoundToZero((GetConVarInt(g_Cvar_MaxChecks) - g_FailedChecks[client])*GetConVarFloat(g_Cvar_RepeatCheck)) );
         }
+
+        //PingWarning(); // TODO : move to this function...
+        PlaySoundClient(client, g_sndWarning);
         g_FailedChecks[client]++;
     }
     else
@@ -240,9 +256,9 @@ IncreaseKickCount(client){
     new int:value;
     decl String:szSteamId[32];
     if(!GetSteamID(client, szSteamId, 32)) return false;
-    PrintToServer("increasing kick count of %s ", szSteamId);
+    //PrintToServer("increasing kick count of %s ", szSteamId);
     if(!GetTrieValue( Handle:g_hClientKickCounts, szSteamId, value )) return false;
-    PrintToServer("current value is %d", value);
+    //PrintToServer("current value is %d", value);
     if(!SetTrieValue( Handle:g_hClientKickCounts, szSteamId, value+1, true )) return false;
     if(!SetTrieValue( Handle:g_hClientLastKick, szSteamId, GetTime(), true )) return false;
     return true;
@@ -353,4 +369,46 @@ bool:IsAdmin(client)
         return false;
 
     return true;
+}
+
+
+
+// sound stuff
+
+
+LoadSounds(){
+    // TODO : observe changes.
+
+    GetConVarString(g_Cvar_PlayWarningSound, g_sndWarning, PLATFORM_MAX_PATH);
+    if(strlen(g_sndWarning)!=0)
+        g_sndWarningAvailable = mCacheSound(g_sndWarning);
+}
+
+PlaySoundClient(client, const String:soundName[]){
+    EmitSoundToClientAny(client, soundName, SOUND_FROM_PLAYER, SNDCHAN_AUTO, SNDLEVEL_GUNFIRE);
+    /*, 
+                 entity = SOUND_FROM_PLAYER,
+                 channel = SNDCHAN_AUTO,
+                 level = SNDLEVEL_NORMAL,
+                 flags = SND_NOFLAGS,
+                 Float:volume = SNDVOL_NORMAL,
+                 pitch = SNDPITCH_NORMAL,
+                 speakerentity = -1,
+                 const Float:origin[3] = NULL_VECTOR,
+                 const Float:dir[3] = NULL_VECTOR,
+                 bool:updatePos = true,
+                 Float:soundtime = 0.0)*/
+}
+
+bool:mCacheSound(const String:soundName[]){
+    if (PrecacheSoundAny(soundName))
+    {
+        decl String:downloadLocation[PLATFORM_MAX_PATH];
+        Format(downloadLocation, sizeof(downloadLocation), "sound/%s", soundName);
+        AddFileToDownloadsTable(downloadLocation);
+        return true;
+    } else {
+        LogMessage("Failed to load sound: %s", soundName);
+        return false;
+    }
 }
